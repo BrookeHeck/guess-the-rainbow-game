@@ -33,6 +33,7 @@ class User {
     this.gameBoard = gameBoard;
   }
 
+  // updates all the stats once a game is complete
   updateStats(winner) {
     if(winner) {
       this.totalGamesWon++;
@@ -47,6 +48,7 @@ class User {
     }
   }
 
+  // it was easier to create an array to loop through to create a stats board
   createStatsArr() {
     return [
       `Games Played: ${this.totalGamesPlayed}`,
@@ -57,6 +59,7 @@ class User {
     ];
   }
 
+  // loops through stats array to add each stat to a div
   displayUserStats() {
     let winStatsArr = this.createStatsArr();
     let statsDiv = document.querySelector('#statsDiv');
@@ -69,7 +72,7 @@ class User {
 }
 
 // class will hold the user's gameboard state so it can be rerendered later
-// also holds all the functions that make the game work
+// also holds all the functions with the game logic
 class GameBoard {
   constructor (correctColorCombo = getColorComboAnswer(), previousGuesses = [], gameCounter = 0) {
     this.correctColorCombo = correctColorCombo;
@@ -100,6 +103,8 @@ class GameBoard {
       colorBoard.appendChild(colorBox);
       colorBoard.addEventListener('click', handleColorPick);
     }
+
+    // backspace button allows user to delete previous pick but not entire guess
     let backButton = document.createElement('button');
     backButton.innerHTML = 'Backspace';
     backButton.addEventListener('click', this.backspace);
@@ -183,6 +188,7 @@ class GameBoard {
     }
   }
 
+  // event handler for backspace button
   backspace() {
     if(currentUser.gameBoard.gameCounter % 5 !== 0) {
       let colorBoxes = document.querySelectorAll('.oneColor');
@@ -192,7 +198,9 @@ class GameBoard {
   }
 }
 
+// this is the event listener for the color choices that users can click
 function handleColorPick(event) {
+  // start by updating the board with users selection
   if(event.target.className === 'colorBox') {
     let boxArray = document.querySelectorAll('.guessRow>*');
     let color = event.target.style.background;
@@ -200,8 +208,11 @@ function handleColorPick(event) {
     boxArray[currentUser.gameBoard.gameCounter].style.background = color;
     currentUser.gameBoard.gameCounter++;
 
+    // if the user makes 5 selections the guess must be handled
     if(currentUser.gameBoard.gameCounter % 5 === 0) {
+      // handle complete guess will add borders to the guess board and save the previous guess
       let winner = handleCompleteGuess();
+      // if they win or run out of guesses, update stats and create a new board for user
       if(currentUser.gameBoard.gameCounter === 30 || winner) {
         currentUser.updateStats(winner);
         currentUser.displayUserStats();
@@ -213,7 +224,7 @@ function handleColorPick(event) {
   }
 }
 
-
+// this function takes the guess uses functions from the gameboard class to get the guess, add it to an array, check if the guess is right, and update the board accordingly
 function handleCompleteGuess() {
   let winner = false;
   let guess = currentUser.gameBoard.getGuessArray();
@@ -239,7 +250,7 @@ function updateLocalStorage() {
   localStorage.setItem('storedUsers', stringArray);
 }
 
-
+// get the users name from input box
 function getUserName() {
   let userName = document.getElementById('userName');
   let player = document.createElement('input');
@@ -263,45 +274,30 @@ function getUserName() {
 
 }
 
+// use a conditional to see if the user is already in local storage
 function checkIfUserExists() {
   if(allUserArray) {
     let isFound = false;
     for(let user in allUserArray) {
       if(allUserArray[user].username === globalUserName) {
         currentUserIndex = user;
-        makeUserForStorage(allUserArray[user]);
+        createUserObject(allUserArray[user]);
         isFound = true;
         break;
       }
     }
     if (!isFound) {
-      makeUserForStorage(null);
+      createUserObject(null);
     }
   } else {
     allUserArray = [];
-    makeUserForStorage(null);
+    createUserObject(null);
   }
   startGame();
 }
 
-function startGame() {
-  currentUser.gameBoard.renderBoard();
-  currentUser.gameBoard.addPreviousGuesses();
-  let startUpdateAt = 0;
-  for(let guess of currentUser.gameBoard.previousGuesses) {
-    currentUser.gameBoard.updateBoard(currentUser.gameBoard.checkGuess(guess), startUpdateAt);
-    startUpdateAt += 5;
-  }
-}
-
-function createExistingUserObject(existingUser) {
-  let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
-
-  let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage);
-  currentUser = existingUserNewObject;
-}
-
-function makeUserForStorage(existingUser) {
+// creates object from an existing user in local storage or makes a new one
+function createUserObject(existingUser) {
   if(existingUser) {
     createExistingUserObject(existingUser);
     allUserArray[currentUserIndex] = currentUser;
@@ -313,6 +309,27 @@ function makeUserForStorage(existingUser) {
   updateLocalStorage();
 }
 
+// if the user exists, makes the user object with data from local storage
+function createExistingUserObject(existingUser) {
+  let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
+
+  let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage);
+  currentUser = existingUserNewObject;
+}
+
+// renders the board and if the user had a previous game it will render previous guesses and update the game counter
+function startGame() {
+  currentUser.gameBoard.renderBoard();
+  currentUser.gameBoard.addPreviousGuesses();
+  let startUpdateAt = 0;
+  for(let guess of currentUser.gameBoard.previousGuesses) {
+    currentUser.gameBoard.updateBoard(currentUser.gameBoard.checkGuess(guess), startUpdateAt);
+    startUpdateAt += 5;
+  }
+}
+
+// start with setting the global variable of user array to what's in local storage
 getLocalStorage();
+// displays the form to get the user's name, and then the previous functions are used to set up the correct game board and start the game
 getUserName();
 
