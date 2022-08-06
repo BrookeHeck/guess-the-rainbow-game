@@ -6,9 +6,24 @@ let globalUserName;
 let currentUser;
 let currentUserIndex = 0;
 
+const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
+  'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(204, 0, 204)', 'rgb(96, 96, 96)'];
+
+// gets five random colors with no duplicates from light color mode array
+function getColorComboAnswer() {
+  let combo = [];
+  while(combo.length < 5) {
+    let index = Math.floor(Math.random() * lightModeColors.length);
+    if(!combo.includes()) {
+      combo.push(lightModeColors[index]);
+    }
+  }
+  return combo;
+}
+
 // class to hold User data to be stored in local storage
 class User {
-  User(username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0) {
+  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0) {
     this.username = username;
     this.totalGamesWon = totalGamesWon;
     this.winStreak = winStreak;
@@ -17,20 +32,17 @@ class User {
   }
 }
 
-// class to hold the gameboard of
+// class will hold the user's gameboard state so it can be rerendered later
+// also holds all the functions that make the game work
 class GameBoard {
-  GameBoard(colorArray, correctOrderArr, previousGuesses = [], gameCounter = 0) {
-    this.colorArray = colorArray;
+  constructor (correctColorCombo = getColorComboAnswer(), previousGuesses = [], gameCounter = 0) {
+    this.correctColorCombo = correctColorCombo;
     this.previousGuesses = previousGuesses;
-    this.correctOrderArr = correctOrderArr;
     this.gameCounter = gameCounter;
   }
 
-  addGuess(guessColorArr) {
-    this.previousGuesses.push(guessColorArr);
-  }
-
   renderBoard() {
+    // guessDiv is the 5 x 6 grid that shows previous guesses/right and wrong answers
     let guessDiv = document.querySelector('#guessDiv');
     for(let y = 0; y < 6; y++) {
       let guessRow = document.createElement('div');
@@ -42,34 +54,45 @@ class GameBoard {
         guessRow.appendChild(oneColor);
       }
     }
+
+    // colorBoard is the color choices that users can click on
     let colorBoard = document.querySelector('#colorBoard');
-    for(let i = 0; i < currentUser.gameBoard.colorArray.length; i++) {
+    for(let i = 0; i < lightModeColors.length; i++) {
       let colorBox = document.createElement('div');
       colorBox.setAttribute('class', 'colorBox');
-      colorBox.style.background =`${currentUser.gameBoard.colorArray[i]}`;
+      colorBox.style.background =`${lightModeColors[i]}`;
       colorBoard.appendChild(colorBox);
       colorBoard.addEventListener('click', handleColorPick);
     }
   }
 
+  // called after 5 colors are picked, gets colors from the boxes on the board and returns an array of all colors picked
   getGuessArray () {
     let guessCount = this.previousGuesses.length + 1;
     let guessArr = [];
     for(let i = 0; i < 5; i++) {
       let currentElement = document.querySelector(`.guessRow:nth-of-type(${guessCount}) .oneColor:nth-child(${i + 1})`);
-      guessArr.push(getHSLString(currentElement));
+      guessArr.push(currentElement.style.background);
     }
     return guessArr;
   }
 
+  // used to store all previous guesses
+  addGuess(guessColorArr) {
+    this.previousGuesses.push(guessColorArr);
+  }
+
+  // compares the users guess to the correct color combo
+  // returns an array of comparison values: 1 is correct color & position, 2 is wrong position, 3 is wrong color
   checkGuess() {
     let compareArr = [];
     let currentGuess = this.previousGuesses[this.previousGuesses.length - 1];
+    console.log(this.correctColorCombo);
     for(let i = 0; i < 5; i++) {
-      if (currentGuess[i] === this.correctOrderArr[i]) {
+      if (currentGuess[i] === this.correctColorCombo[i]) {
         compareArr.push(1);
       }
-      else if (this.correctOrderArr.includes(currentGuess[i])) {
+      else if (this.correctColorCombo.includes(currentGuess[i])) {
         compareArr.push(2);
       }
       else {
@@ -79,6 +102,7 @@ class GameBoard {
     return compareArr;
   }
 
+  // gives a color in the guessDiv a border based on the key value returned from the checkGuess function
   updateBoard(compareArr, counterStart) {
     for(let i = 0; i < compareArr.length; i++) {
       let key = document.querySelectorAll('.guessRow>*')[i + counterStart];
@@ -92,6 +116,7 @@ class GameBoard {
     }
   }
 
+  // clears the color picker board and puts a message and play again button after the game ends
   clear (winner) {
     let gameBoard = document.querySelector('#colorBoard');
     gameBoard.innerHTML = '';
@@ -100,6 +125,7 @@ class GameBoard {
     winnerPTag.innerHTML = strMessage;
     gameBoard.style.flexDirection = 'column';
     gameBoard.appendChild(winnerPTag);
+
     let playAgainButton = document.createElement('button');
     playAgainButton.innerHTML = 'Play Again?';
     playAgainButton.addEventListener('click', () => {
@@ -107,35 +133,24 @@ class GameBoard {
     });
     gameBoard.appendChild(playAgainButton);
   }
-}
 
-function addPreviousGuesses() {
-  for(let i = 0; i < currentUser.gameBoard.previousGuesses.length; i++) {
-    for(let j = 0; j < 5; j++) {
-      let currentElement = document.querySelector(`.guessRow:nth-of-type(${i + 1}) .oneColor:nth-child(${j + 1})`);
-      console.log(currentElement);
-      console.log(currentUser.gameBoard.previousGuesses[i][j]);
-      currentElement.style.background = currentUser.gameBoard.previousGuesses[i][j];
+  // when a game state is rerendered this loops through previous guesses to update the board
+  addPreviousGuesses() {
+    for(let i = 0; i < currentUser.gameBoard.previousGuesses.length; i++) {
+      for(let j = 0; j < 5; j++) {
+        let currentElement = document.querySelector(`.guessRow:nth-of-type(${i + 1}) .oneColor:nth-child(${j + 1})`);
+        console.log(currentElement);
+        console.log(currentUser.gameBoard.previousGuesses[i][j]);
+        currentElement.style.background = currentUser.gameBoard.previousGuesses[i][j];
+      }
     }
   }
-}
-
-function getHSLString(e) {
-  let boardArr = document.querySelectorAll('.colorBox');
-  let pickedIndex = -1;
-  for(let i = 0; i < boardArr.length; i++) {
-    if (boardArr[i].style.background === e.style.background) {
-      pickedIndex = i;
-      break;
-    }
-  }
-  return currentUser.gameBoard.colorArray[pickedIndex];
 }
 
 function handleColorPick(event) {
   if(event.target.className === 'colorBox') {
     let boxArray = document.querySelectorAll('.guessRow>*');
-    let color = getHSLString(event.target);
+    let color = event.target.style.background;
 
     boxArray[currentUser.gameBoard.gameCounter].style.background = color;
     currentUser.gameBoard.gameCounter++;
@@ -149,9 +164,7 @@ function handleColorPick(event) {
           currentUser.updateStats;
         }
         currentUser.gameBoard.clear(winner);
-        let newColArr = generateRandomColors();
-        let newColCombo = getCorrectOrder(newColArr);
-        currentUser.gameBoard = new GameBoard(newColArr, newColCombo);
+        currentUser.gameBoard = new GameBoard();
         updateLocalStorage();
       }
     }
@@ -172,88 +185,43 @@ function handleCompleteGuess() {
   return winner;
 }
 
-function getCorrectOrder(colorArray) {
-  let winningCombo = [];
-  while(winningCombo.length < 5) {
-    let randColor = getRandomNumber(0, (colorArray.length-1));
-    if (!winningCombo.includes(colorArray[randColor])) {
-      winningCombo.push(colorArray[randColor]);
-    }
-  }
-  return winningCombo;
+
+function getLocalStorage() {
+  allUserArray = JSON.parse(localStorage.getItem('storedUsers'));
 }
 
-function generateRandomColors() {
-  let redHues = {
-    minRange: -10,
-    maxRange: 5
-  };
-  let orangeHues = {
-    minRange: 20,
-    maxRange: 44
-  };
-  let yellowsHues = {
-    minRange: 52,
-    maxRange: 61
-  };
-  let greenHues = {
-    minRange: 71,
-    maxRange: 143
-  };
-  let cyanHues = {
-    minRange: 163,
-    maxRange: 186
-  };
-  let blueHues = {
-    minRange: 185,
-    maxRange: 237
-  };
-  let violetHues = {
-    minRange: 245,
-    maxRange: 287
-  };
-  let magentaHues = {
-    minRange: 296,
-    maxRange: 327
-  };
-  let hueObjectsArray = [
-    redHues,
-    orangeHues,
-    yellowsHues,
-    greenHues,
-    cyanHues,
-    blueHues,
-    violetHues,
-    magentaHues
-  ];
 
-
-  let hslArray = [];
-  for (let i = 0; i < hueObjectsArray.length; i++) {
-    let randomHue = getARandomColorInRange(hueObjectsArray[i]);
-    let randomSaturation = getRandomNumber(65, 85);
-    let randomLightness = getRandomNumber(50, 60);
-    hslArray.push(`hsl(${randomHue},${randomSaturation}%,${randomLightness}%)`);
-
-  }
-  return hslArray;
+function updateLocalStorage() {
+  localStorage.clear();
+  let stringArray = JSON.stringify(allUserArray);
+  localStorage.setItem('storedUsers', stringArray);
 }
 
-function getARandomColorInRange(colorObject) {
-  let hueInRange = getRandomNumber(colorObject.minRange, colorObject.maxRange);
-  return hueInRange;
+
+function getUserName() {
+  let userName = document.getElementById('userName');
+  let player = document.createElement('input');
+  player.type='text';
+  player.id='name';
+  player.name = 'name';
+  let playerLabel = document.createElement('label');
+  playerLabel.for='name';
+  playerLabel.innerHTML='Please enter your name.';
+  let nameButton = document.createElement('button');
+  nameButton.type='button';
+  nameButton.innerHTML='Enter';
+  nameButton.addEventListener('click', () => {
+    globalUserName = document.querySelector('#name').value;
+    document.querySelector('#userName').innerHTML = '';
+    checkIfUserExists();
+  });
+  userName.appendChild(playerLabel);
+  userName.appendChild(player);
+  userName.appendChild(nameButton);
+
 }
-
-function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-getLocalStorage();
-createNewUser();
-
 
 function checkIfUserExists() {
-  let startGame = false;
   if(allUserArray) {
     let isFound = false;
     for(let user in allUserArray) {
@@ -271,72 +239,34 @@ function checkIfUserExists() {
     allUserArray = [];
     makeUserForStorage(null);
   }
-  startGame = true;
-  if(startGame) {
-    currentUser.gameBoard.renderBoard();
-    addPreviousGuesses();
-    let startUpdateAt = 0;
-    for(let guess of currentUser.gameBoard.previousGuesses) {
-      currentUser.gameBoard.updateBoard(currentUser.gameBoard.checkGuess(guess), startUpdateAt);
-      startUpdateAt += 5;
-    }
+  startGame();
+}
+
+function startGame() {
+  currentUser.gameBoard.renderBoard();
+  currentUser.gameBoard.addPreviousGuesses();
+  let startUpdateAt = 0;
+  for(let guess of currentUser.gameBoard.previousGuesses) {
+    currentUser.gameBoard.updateBoard(currentUser.gameBoard.checkGuess(guess), startUpdateAt);
+    startUpdateAt += 5;
   }
 }
 
 
 function makeUserForStorage(existingUser) {
   if(existingUser) {
-    let existingGame = new GameBoard(existingUser.gameBoard.colorArray, existingUser.gameBoard.correctOrderArr, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
+    let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
     let existingUserNewObject = new User(globalUserName, existingGame);
     currentUser = existingUserNewObject;
     allUserArray[currentUserIndex] = existingUserNewObject;
   } else if (!existingUser) {
-    let newColorArray = generateRandomColors();
-    let newCombo = getCorrectOrder(newColorArray);
-    let newGame = new GameBoard(newColorArray, newCombo);
+    let newGame = new GameBoard();
     currentUser = new User(globalUserName, newGame);
     allUserArray.push(currentUser);
   }
   updateLocalStorage();
 }
 
-function getUser() {
-  let name = document.getElementById('name');
-  globalUserName = name.value;
-  let userForm = document.querySelector('#userName');
-  userForm.innerHTML = '';
-}
-
-
-function getLocalStorage() {
-  allUserArray = JSON.parse(localStorage.getItem('storedUsers'));
-}
-
-function createNewUser() {
-  let userName = document.getElementById('userName');
-  let player = document.createElement('input');
-  player.type='text';
-  player.id='name';
-  player.name = 'name';
-  let playerLabel = document.createElement('label');
-  playerLabel.for='name';
-  playerLabel.innerHTML='Please enter your name.';
-  let nameButton = document.createElement('button');
-  nameButton.type='button';
-  nameButton.innerHTML='Submit';
-  nameButton.addEventListener('click', () => {
-    getUser();
-    checkIfUserExists();
-  });
-  userName.appendChild(playerLabel);
-  userName.appendChild(player);
-  userName.appendChild(nameButton);
-
-}
-
-function updateLocalStorage() {
-  localStorage.clear();
-  let stringArray = JSON.stringify(allUserArray);
-  localStorage.setItem('storedUsers', stringArray);
-}
+getLocalStorage();
+getUserName();
 
