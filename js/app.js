@@ -14,7 +14,6 @@ function getColorComboAnswer() {
   let combo = [];
   while(combo.length < 5) {
     let index = Math.floor(Math.random() * lightModeColors.length);
-    console.log(combo.includes(lightModeColors[index]));
     if(!combo.includes(lightModeColors[index])) {
       combo.push(lightModeColors[index]);
     }
@@ -38,6 +37,8 @@ class User {
     if(winner) {
       this.totalGamesWon++;
       this.winStreak++;
+    } else {
+      this.winStreak = 0;
     }
     this.totalGamesPlayed++;
     this.winAverage = Math.floor((this.totalGamesWon / this.totalGamesPlayed) * 100);
@@ -62,7 +63,6 @@ class User {
     for(let stat of winStatsArr) {
       let statPar = document.createElement('p');
       statPar.innerHTML = stat;
-      console.log(statPar);
       statsDiv.appendChild(statPar);
     }
   }
@@ -100,6 +100,10 @@ class GameBoard {
       colorBoard.appendChild(colorBox);
       colorBoard.addEventListener('click', handleColorPick);
     }
+    let backButton = document.createElement('button');
+    backButton.innerHTML = 'Backspace';
+    backButton.addEventListener('click', this.backspace);
+    colorBoard.appendChild(backButton);
   }
 
   // called after 5 colors are picked, gets colors from the boxes on the board and returns an array of all colors picked
@@ -174,10 +178,16 @@ class GameBoard {
     for(let i = 0; i < currentUser.gameBoard.previousGuesses.length; i++) {
       for(let j = 0; j < 5; j++) {
         let currentElement = document.querySelector(`.guessRow:nth-of-type(${i + 1}) .oneColor:nth-child(${j + 1})`);
-        console.log(currentElement);
-        console.log(currentUser.gameBoard.previousGuesses[i][j]);
         currentElement.style.background = currentUser.gameBoard.previousGuesses[i][j];
       }
+    }
+  }
+
+  backspace() {
+    if(currentUser.gameBoard.gameCounter % 5 !== 0) {
+      let colorBoxes = document.querySelectorAll('.oneColor');
+      colorBoxes[currentUser.gameBoard.gameCounter - 1].style.background = 'white';
+      currentUser.gameBoard.gameCounter--;
     }
   }
 }
