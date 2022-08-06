@@ -7,25 +7,30 @@ body {
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
+  font-family: 'Mouse Memoirs', sans-serif;
+  width: 900px;
+  margin: 0 auto;
+}
+
+header {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+}
+
+h1 {
+  font-size: 2.5rem;
 }
 
 #guessDiv {
-  background-color: #B0D3F8;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
   margin-top: 30px;
   margin-bottom: 10px;
   padding: 10px;
   padding-bottom: 0;
-}
-
-#userName {
-  position: fixed;
-  margin: auto;
-  margin-top: 450px;
-  width: 475px;
-  /* margin-top: 300px;
-  width: 475px; */
 }
 
 #colorBoard {
@@ -49,6 +54,43 @@ body {
   width: 50px;
   height: 50px;
   margin: 0 5px;
+}
+
+.colorBox:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+#userName {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: 1.5rem;
+  margin: 0 auto;
+}
+
+#userName>* {
+  padding: 5px;
+  font-size: 1.75rem;
+}
+
+button {
+  margin-top: 10px;
+  border: solid darkorchid 2px;
+  border-radius: 5px;
+  background-color: darkorchid;
+  color: white;
+}
+
+button:hover {
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+footer {
+  width: 100%;
+  margin-top: 50px;
 }
 
 

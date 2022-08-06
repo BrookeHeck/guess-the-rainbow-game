@@ -109,7 +109,7 @@ class GameBoard {
       if(compareArr[i] === 1) {
         key.style.border = 'solid green 5px';
       } else if (compareArr[i] === 2) {
-        key.style.border = 'solid yellow 5px';
+        key.style.border = 'solid lightgrey 5px';
       } else {
         key.style.border = 'solid red 5px';
       }
@@ -206,7 +206,7 @@ function getUserName() {
   player.name = 'name';
   let playerLabel = document.createElement('label');
   playerLabel.for='name';
-  playerLabel.innerHTML='Please enter your name.';
+  playerLabel.innerHTML='Enter Username: ';
   let nameButton = document.createElement('button');
   nameButton.type='button';
   nameButton.innerHTML='Enter';
