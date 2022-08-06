@@ -15,5 +15,3 @@ function changeHeaderColor() {
     if(counter === colors.length) counter = 0;
   }
 }
-
-changeHeaderColor();
