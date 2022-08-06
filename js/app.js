@@ -267,11 +267,11 @@ function getUserName() {
     globalUserName = document.querySelector('#name').value;
     document.querySelector('#userName').innerHTML = '';
     checkIfUserExists();
+    document.querySelector('#displayName').innerHTML = globalUserName;
   });
   userName.appendChild(playerLabel);
   userName.appendChild(player);
   userName.appendChild(nameButton);
-
 }
 
 // use a conditional to see if the user is already in local storage

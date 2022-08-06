@@ -24,8 +24,13 @@ nav {
 
 nav ul {
   width: 100%;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-end;
+}
+
+nav ul li {
+  padding: 5px;
+  font-size: 1.7rem;
 }
 
 #guessDiv {
