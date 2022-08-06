@@ -7,7 +7,7 @@ let currentUser;
 let currentUserIndex = 0;
 
 const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
-  'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(204, 0, 204)', 'rgb(96, 96, 96)'];
+  'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(96, 96, 96)'];
 
 // gets five random colors with no duplicates from light color mode array
 function getColorComboAnswer() {
