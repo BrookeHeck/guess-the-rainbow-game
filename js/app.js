@@ -24,12 +24,47 @@ function getColorComboAnswer() {
 
 // class to hold User data to be stored in local storage
 class User {
-  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0) {
+  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0, totalGamesPlayed = 0, winAverage = 0) {
     this.username = username;
     this.totalGamesWon = totalGamesWon;
     this.winStreak = winStreak;
     this.highestWinStreak = highestWinStreak;
+    this.totalGamesPlayed = totalGamesPlayed;
+    this.winAverage = winAverage;
     this.gameBoard = gameBoard;
+  }
+
+  updateStats(winner) {
+    if(winner) {
+      this.totalGamesWon++;
+      this.winStreak++;
+    }
+    this.totalGamesPlayed++;
+    this.winAverage = Math.floor((this.totalGamesWon / this.totalGamesPlayed) * 100);
+    if(this.highestWinStreak < this.winStreak) {
+      this.highestWinStreak = this.winStreak;
+    }
+  }
+
+  createStatsArr() {
+    return [
+      `Games Played: ${this.totalGamesPlayed}`,
+      `Games Won: ${this.totalGamesWon}`,
+      `Win Average: ${this.winAverage}%`,
+      `Win Streak: ${this.winStreak}`,
+      `Highest Win Streak: ${this.highestWinStreak}`
+    ];
+  }
+
+  displayUserStats() {
+    let winStatsArr = this.createStatsArr();
+    let statsDiv = document.querySelector('#statsDiv');
+    for(let stat of winStatsArr) {
+      let statPar = document.createElement('p');
+      statPar.innerHTML = stat;
+      console.log(statPar);
+      statsDiv.appendChild(statPar);
+    }
   }
 }
 
@@ -158,11 +193,8 @@ function handleColorPick(event) {
     if(currentUser.gameBoard.gameCounter % 5 === 0) {
       let winner = handleCompleteGuess();
       if(currentUser.gameBoard.gameCounter === 30 || winner) {
-        if(winner) {
-          currentUser.updateStats;
-        } else {
-          currentUser.updateStats;
-        }
+        currentUser.updateStats(winner);
+        currentUser.displayUserStats();
         currentUser.gameBoard.clear(winner);
         currentUser.gameBoard = new GameBoard();
         updateLocalStorage();
@@ -252,13 +284,17 @@ function startGame() {
   }
 }
 
+function createExistingUserObject(existingUser) {
+  let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
+
+  let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage);
+  currentUser = existingUserNewObject;
+}
 
 function makeUserForStorage(existingUser) {
   if(existingUser) {
-    let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
-    let existingUserNewObject = new User(globalUserName, existingGame);
-    currentUser = existingUserNewObject;
-    allUserArray[currentUserIndex] = existingUserNewObject;
+    createExistingUserObject(existingUser);
+    allUserArray[currentUserIndex] = currentUser;
   } else if (!existingUser) {
     let newGame = new GameBoard();
     currentUser = new User(globalUserName, newGame);
