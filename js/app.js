@@ -14,7 +14,8 @@ function getColorComboAnswer() {
   let combo = [];
   while(combo.length < 5) {
     let index = Math.floor(Math.random() * lightModeColors.length);
-    if(!combo.includes()) {
+    console.log(combo.includes(lightModeColors[index]));
+    if(!combo.includes(lightModeColors[index])) {
       combo.push(lightModeColors[index]);
     }
   }
@@ -87,7 +88,6 @@ class GameBoard {
   checkGuess() {
     let compareArr = [];
     let currentGuess = this.previousGuesses[this.previousGuesses.length - 1];
-    console.log(this.correctColorCombo);
     for(let i = 0; i < 5; i++) {
       if (currentGuess[i] === this.correctColorCombo[i]) {
         compareArr.push(1);
