@@ -1,7 +1,6 @@
 'use strict';
 
-const colors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
-  'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(96, 96, 96)'];
+const colors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)', 'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(96, 96, 96)'];
 
 function changeHeaderColor() {
   let logo = document.querySelector('h1');
@@ -15,3 +14,4 @@ function changeHeaderColor() {
     if(counter === colors.length) counter = 0;
   }
 }
+changeHeaderColor();

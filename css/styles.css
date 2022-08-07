@@ -33,47 +33,6 @@ nav ul li {
   font-size: 1.7rem;
 }
 
-#guessDiv {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  margin-top: 30px;
-  margin-bottom: 10px;
-  padding: 10px;
-  padding-bottom: 0;
-}
-
-#colorBoard {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  margin-top: 25px 10px 10px 10px;
-}
-
-.guessRow{
-  display: flex;
-  min-width: fit-content;
-}
-
-.oneColor {
-  min-width: fit-content;
-}
-
-.oneColor, .colorBox{
-  border: solid black 1px;
-  background-color: white;
-  display: inline;
-  width: 50px;
-  height: 50px;
-  margin: 5px 5px;
-}
-
-.colorBox:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-
 #userName {
   display: flex;
   flex-direction: column;
@@ -99,6 +58,63 @@ button {
 button:hover {
   cursor: pointer;
   transform: scale(1.2);
+}
+
+#guessDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding: 10px;
+  padding-bottom: 0;
+}
+
+#colorBoard {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px 10px 10px 10px;
+  max-width: 350px;
+}
+
+.guessRow{
+  display: flex;
+  min-width: fit-content;
+}
+
+.oneColor {
+  min-width: fit-content;
+}
+
+.oneColor, .colorBox {
+  border: solid black 1px;
+  border-radius: 2px;
+  background-color: white;
+  display: inline;
+  width: 50px;
+  height: 50px;
+  margin: 5px 5px;
+}
+
+#colorBoard img {
+  display: inline;
+  width: 50px;
+  height: 50px;
+  margin: 5px 5px;
+}
+
+#colorBoard img:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.colorBox:hover {
+  cursor: pointer;
+  transform: scale(1.1);
 }
 
 footer {

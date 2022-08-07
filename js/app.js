@@ -105,8 +105,9 @@ class GameBoard {
     }
 
     // backspace button allows user to delete previous pick but not entire guess
-    let backButton = document.createElement('button');
-    backButton.innerHTML = 'Backspace';
+    let backButton = document.createElement('img');
+    backButton.src = './img/icons8-backspace-40.png';
+    backButton.alt = 'backspace';
     backButton.addEventListener('click', this.backspace);
     colorBoard.appendChild(backButton);
   }
