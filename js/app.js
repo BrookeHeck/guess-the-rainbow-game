@@ -326,8 +326,6 @@ function createExistingUserObject(existingUser) {
 
 // renders the board and if the user had a previous game it will render previous guesses and update the game counter
 function startGame() {
-  console.log(currentUser);
-  console.log(currentUser.createStatsArr());
   currentUser.gameBoard.renderBoard();
   currentUser.gameBoard.addPreviousGuesses();
   let startUpdateAt = 0;
