@@ -360,7 +360,7 @@ function settingsColorToggleHandler() {
   currentUser.colorMode = currentUser.colorMode === 'light' ? 'dark' : 'light';
   let newColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
   toggleBackgroundColor();
-  toggleColorCombo(newColorArr);
+  // toggleColorCombo(newColorArr);
   changeHeaderColor(newColorArr);
 }
 
