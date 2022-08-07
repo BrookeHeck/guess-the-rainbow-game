@@ -400,7 +400,7 @@ function toggleBackgroundColor() {
   if(currentUser.colorMode === 'light') {
     navClasses.replace('bg-dark', 'bg-light');
     document.querySelector('main').style.background = 'white';
-    displayName.style.color = 'white';
+    displayName.style.color = 'black';
   }
   if (currentUser.colorMode === 'dark') {
     navClasses.replace('bg-light', 'bg-dark');
