@@ -9,6 +9,8 @@ let currentUserIndex = 0;
 const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
   'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(96, 96, 96)'];
 
+const darkModeColors = ['rgb(255, 51, 51)', 'rgb(255, 255, 153)', 'rgb(255, 255, 102)', 'rgb(153, 255, 153)', 'rgb(153, 204, 255)', 'rgb(204, 153, 255)', 'rgb(255, 153, 204)', 'rgb(224, 224, 224)'];
+
 // gets five random colors with no duplicates from light color mode array
 function getColorComboAnswer() {
   let combo = [];
@@ -23,13 +25,14 @@ function getColorComboAnswer() {
 
 // class to hold User data to be stored in local storage
 class User {
-  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0, totalGamesPlayed = 0, winAverage = 0) {
+  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0, totalGamesPlayed = 0, winAverage = 0, colorMode = 'light') {
     this.username = username;
     this.totalGamesWon = totalGamesWon;
     this.winStreak = winStreak;
     this.highestWinStreak = highestWinStreak;
     this.totalGamesPlayed = totalGamesPlayed;
     this.winAverage = winAverage;
+    this.colorMode = colorMode;
     this.gameBoard = gameBoard;
   }
 
@@ -320,11 +323,12 @@ function createUserObject(existingUser) {
 function createExistingUserObject(existingUser) {
   let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
 
-  let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage);
+  let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage, existingUser.colorMode);
   currentUser = existingUserNewObject;
 }
 
 // renders the board and if the user had a previous game it will render previous guesses and update the game counter
+// also adds event listeners so that user can see their game stats and settings
 function startGame() {
   currentUser.gameBoard.renderBoard();
   currentUser.gameBoard.addPreviousGuesses();
@@ -337,10 +341,70 @@ function startGame() {
   statsButton.addEventListener('click', () => {
     currentUser.displayUserStats();
   });
+  let settingsButton =  document.querySelector('ul li:nth-of-type(3) img');
+  settingsButton.addEventListener('click', settingsColorToggleHandler); 
 }
 
 // start with setting the global variable of user array to what's in local storage
 getLocalStorage();
 // displays the form to get the user's name, and then the previous functions are used to set up the correct game board and start the game
 getUserName();
+// start the user off with a light background
+changeHeaderColor(lightModeColors);
 
+// The following code will change settings based on user input
+
+
+// enable setting to be change after game has started
+function settingsColorToggleHandler() {
+  currentUser.colorMode = currentUser.colorMode === 'light' ? 'dark' : 'light';
+  let newColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
+  toggleBackgroundColor();
+  toggleColorCombo(newColorArr);
+  changeHeaderColor(newColorArr);
+}
+
+// if the user changes color mode, this will be used to change the rgb colors in the correct combo array
+function toggleColorCombo(newColorArr) {
+  console.log('toggleColorCombo');
+  let oldColorArr = currentUser === 'light' ? darkModeColors : lightModeColors;
+  for(let correctColor of currentUser.gameBoard.correctColorCombo) {
+    for(let colorIndex in oldColorArr) {
+      if(correctColor === oldColorArr[colorIndex]) {
+        currentUser.gameBoard.correctColorCombo[colorIndex] = newColorArr[colorIndex];
+      }
+    }
+  }
+}
+
+// toggle the header between light and dark mode colors
+function changeHeaderColor(colorModeArr) {
+  console.log('changeHeaderColor');
+  let logo = document.querySelector('h1');
+  logo.innerHTML = '';
+  let counter = 0;
+  for (let char of 'Guess the Rainbow') {
+    let charSpan = document.createElement('span');
+    charSpan.innerHTML = char;
+    if(char !== ' ') charSpan.style.color = colorModeArr[counter];
+    logo.appendChild(charSpan);
+    counter++;
+    if(counter === colorModeArr.length) counter = 0;
+  }
+}
+
+function toggleBackgroundColor() {
+  console.log('toggleBackgroundColor');
+  let navClasses = document.querySelector('.navbar').classList;
+  let displayName = document.querySelector('#displayName');
+  if(currentUser.colorMode === 'light') {
+    navClasses.replace('bg-dark', 'bg-light');
+    document.querySelector('main').style.background = 'white';
+    displayName.style.color = 'white';
+  }
+  if (currentUser.colorMode === 'dark') {
+    navClasses.replace('bg-light', 'bg-dark');
+    document.querySelector('main').style.background = 'black';
+    displayName.style.color = 'white';
+  }
+}
