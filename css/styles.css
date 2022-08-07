@@ -137,6 +137,14 @@ button:hover {
   transform: scale(1.1);
 }
 
+#colorBoard p {
+  background-color: darkorchid;
+  color: white;
+  padding: 5px;
+  border: transparent;
+  border-radius: 2px;
+}
+
 .colorBox:hover {
   cursor: pointer;
   transform: scale(1.1);
