@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+html {
+  max-height: 100%;
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -10,7 +14,10 @@ body {
   font-family: 'Mouse Memoirs', sans-serif;
   margin: 0 auto;
   background-image: url(./../img/background.jpg);
-  background-size: contain;
+  background-size: cover;
+  background-repeat: no-repeat;
+  max-height: fit-content;
+  background-position: center center;
 }
 
 header {
