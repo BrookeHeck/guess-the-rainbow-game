@@ -63,6 +63,12 @@ class User {
   displayUserStats() {
     let winStatsArr = this.createStatsArr();
     let statsDiv = document.querySelector('#statsDiv');
+    let closeButton = document.createElement('button');
+    closeButton.innerHTML = 'X';
+    closeButton.addEventListener('click', () => {
+      statsDiv.innerHTML = '';
+    });
+    statsDiv.appendChild(closeButton);
     for(let stat of winStatsArr) {
       let statPar = document.createElement('p');
       statPar.innerHTML = stat;
@@ -327,6 +333,8 @@ function startGame() {
     currentUser.gameBoard.updateBoard(currentUser.gameBoard.checkGuess(guess), startUpdateAt);
     startUpdateAt += 5;
   }
+  let statsButton = document.querySelector('nav img:first-of-type');
+  statsButton.addEventListener('click', currentUser.displayUserStats);
 }
 
 // start with setting the global variable of user array to what's in local storage
