@@ -342,7 +342,7 @@ function startGame() {
     currentUser.displayUserStats();
   });
   let settingsButton =  document.querySelector('ul li:nth-of-type(3) img');
-  settingsButton.addEventListener('click', settingsColorToggleHandler); 
+  settingsButton.addEventListener('click', settingsColorToggleHandler);
 }
 
 // start with setting the global variable of user array to what's in local storage
@@ -357,16 +357,18 @@ changeHeaderColor(lightModeColors);
 
 // enable setting to be change after game has started
 function settingsColorToggleHandler() {
+  console.log('click');
   currentUser.colorMode = currentUser.colorMode === 'light' ? 'dark' : 'light';
   let newColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
+  console.log(currentUser.colorMode);
   toggleBackgroundColor();
   // toggleColorCombo(newColorArr);
+  // changeBoardColors(newColorArr);
   changeHeaderColor(newColorArr);
 }
 
 // if the user changes color mode, this will be used to change the rgb colors in the correct combo array
 function toggleColorCombo(newColorArr) {
-  console.log('toggleColorCombo');
   let oldColorArr = currentUser === 'light' ? darkModeColors : lightModeColors;
   for(let correctColor of currentUser.gameBoard.correctColorCombo) {
     for(let colorIndex in oldColorArr) {
@@ -379,7 +381,6 @@ function toggleColorCombo(newColorArr) {
 
 // toggle the header between light and dark mode colors
 function changeHeaderColor(colorModeArr) {
-  console.log('changeHeaderColor');
   let logo = document.querySelector('h1');
   logo.innerHTML = '';
   let counter = 0;
@@ -394,7 +395,6 @@ function changeHeaderColor(colorModeArr) {
 }
 
 function toggleBackgroundColor() {
-  console.log('toggleBackgroundColor');
   let navClasses = document.querySelector('.navbar').classList;
   let displayName = document.querySelector('#displayName');
   if(currentUser.colorMode === 'light') {
@@ -406,5 +406,26 @@ function toggleBackgroundColor() {
     navClasses.replace('bg-light', 'bg-dark');
     document.querySelector('main').style.background = 'black';
     displayName.style.color = 'white';
+  }
+}
+
+function changeBoardColors(newColorArr) {
+  let oldColorArr = currentUser === 'light' ? darkModeColors : lightModeColors;
+
+  let guessBoxes = document.querySelectorAll('.oneColor');
+  let selectionBoxes = document.querySelectorAll('.colorBox');
+  let allBoxes = [];
+  allBoxes.push.apply(allBoxes, guessBoxes);
+  allBoxes.push.apply(allBoxes, selectionBoxes);
+  console.log(allBoxes);
+
+  for(let box of allBoxes) {
+    if(box.style.background !== '') {
+      for(let colorIndex in oldColorArr) {
+        if(box === oldColorArr[colorIndex]) {
+          box.style.background = newColorArr[colorIndex];
+        }
+      }
+    }
   }
 }
