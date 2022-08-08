@@ -5,6 +5,7 @@ let allUserArray;
 let globalUserName;
 let currentUser;
 let currentUserIndex = 0;
+let numGuesses = 6;
 
 const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
   'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(115, 54, 0)'];
@@ -94,7 +95,7 @@ class GameBoard {
   renderBoard() {
     // guessDiv is the 5 x 6 grid that shows previous guesses/right and wrong answers
     let guessDiv = document.querySelector('#guessDiv');
-    for(let y = 0; y < 6; y++) {
+    for(let y = 0; y < numGuesses; y++) {
       let guessRow = document.createElement('div');
       guessRow.setAttribute('class', 'guessRow');
       guessDiv.appendChild(guessRow);
@@ -209,11 +210,30 @@ class GameBoard {
     }
   }
 
+  switchToEasyMode() {
+    if(lightModeColors.length === 9) {
+      lightModeColors.pop();
+      darkModeColors.pop();
+    }
+    numGuesses = 6;
+    currentUser.gameBoard.startAnotherGame();
+  }
+
   switchToMediumMode() {
     if(lightModeColors.length === 8) {
       lightModeColors.push('rgb(0, 128, 128)');
-      darkModeColors.push('rgb(77, 255, 255)');
+      darkModeColors.push('rgb(179,191,255)');
     }
+    numGuesses = 6;
+    currentUser.gameBoard.startAnotherGame();
+  }
+
+  switchToHardMode() {
+    if(lightModeColors.length === 8) {
+      lightModeColors.push('rgb(0, 128, 128)');
+      darkModeColors.push('rgb(179,191,255)');
+    }
+    numGuesses = 5;
     currentUser.gameBoard.startAnotherGame();
   }
 
@@ -243,7 +263,7 @@ function handleColorPick(event) {
       // handle complete guess will add borders to the guess board and save the previous guess
       let winner = handleCompleteGuess();
       // if they win or run out of guesses, update stats and create a new board for user
-      if(currentUser.gameBoard.gameCounter === 30 || winner) {
+      if(currentUser.gameBoard.gameCounter === (numGuesses * 5) || winner) {
         currentUser.updateStats(winner);
         currentUser.displayUserStats();
         currentUser.gameBoard.clear(winner);
@@ -352,6 +372,7 @@ function createExistingUserObject(existingUser) {
 // renders the board and if the user had a previous game it will render previous guesses and update the game counter
 // also adds event listeners so that user can see their game stats and settings
 function startGame() {
+  document.querySelector('.navbar-nav').style.visibility = 'visible';
   currentUser.gameBoard.renderBoard();
   currentUser.gameBoard.addPreviousGuesses();
   let startUpdateAt = 0;
@@ -366,9 +387,14 @@ function startGame() {
   let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type');
   colorModeToggle.addEventListener('click', colorModeToggleHandler);
 
+  let easySelection = document.querySelector('.dropdown-menu li:nth-child(2) span:nth-child(1)');
+  easySelection.addEventListener('click', currentUser.gameBoard.switchToEasyMode);
+
   let mediumSelection = document.querySelector('.dropdown-menu li:nth-child(2) span:nth-child(3)');
   mediumSelection.addEventListener('click', currentUser.gameBoard.switchToMediumMode);
-  console.log(currentUser.gameBoard.correctColorCombo);
+
+  let hardSelection = document.querySelector('.dropdown-menu li:nth-child(2) span:nth-child(5)');
+  hardSelection.addEventListener('click', currentUser.gameBoard.switchToHardMode);
 }
 
 // start with setting the global variable of user array to what's in local storage
