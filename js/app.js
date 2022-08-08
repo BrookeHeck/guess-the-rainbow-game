@@ -7,9 +7,9 @@ let currentUser;
 let currentUserIndex = 0;
 
 const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
-  'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(96, 96, 96)'];
+  'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(115, 54, 0)'];
 
-const darkModeColors = ['rgb(255, 51, 51)', 'rgb(255, 255, 153)', 'rgb(255, 255, 102)', 'rgb(153, 255, 153)', 'rgb(153, 204, 255)', 'rgb(204, 153, 255)', 'rgb(255, 153, 204)', 'rgb(224, 224, 224)'];
+const darkModeColors = ['rgb(255, 0, 0)', 'rgb(255, 172, 0)', 'rgb(255, 241, 0)', 'rgb(11, 255, 0)', 'rgb(0, 246, 255)', 'rgb(176, 38, 255)', 'rgb(255, 110, 199)', 'rgb(173, 81, 0)'];
 
 // gets five random colors with no duplicates from light color mode array
 function getColorComboAnswer() {
@@ -163,7 +163,7 @@ class GameBoard {
       if(compareArr[i] === 1) {
         key.style.border = 'solid green 5px';
       } else if (compareArr[i] === 2) {
-        key.style.border = 'solid lightgrey 5px';
+        key.style.border = 'solid rgb(170,181,167) 5px';
       } else {
         key.style.border = 'solid red 5px';
       }
