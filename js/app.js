@@ -350,7 +350,7 @@ function startGame() {
   statsButton.addEventListener('click', () => {
     currentUser.displayUserStats();
   });
-  let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type')
+  let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type');
   colorModeToggle.addEventListener('click', colorModeToggleHandler);
 }
 
@@ -439,6 +439,7 @@ function toggleBoardColors(newColorArr, oldColorArr) {
   }
 }
 
+// loops through the previous guess array and changes them all to dark mode colors
 function togglePreviousGuesses(newColorArr, oldColorArr) {
   for(let guessIndex in currentUser.gameBoard.previousGuesses) {
     for(let colorSelected in currentUser.gameBoard.previousGuesses[guessIndex]) {
