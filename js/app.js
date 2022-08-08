@@ -174,25 +174,20 @@ class GameBoard {
 
   // clears the color picker board and puts a message and play again button after the game ends
   clear (winner) {
-    let gameBoard = document.querySelector('#colorBoard');
-    gameBoard.innerHTML = '';
+    let gameBoardDiv = document.querySelector('#colorBoard');
+    gameBoardDiv.innerHTML = '';
     let strMessage = winner ? 'Congrats, You Won!' : 'So Close! Thanks for Playing';
     let winnerPTag = document.createElement('p');
-    gameBoard.style.flexDirection = 'column';
+    gameBoardDiv.style.flexDirection = 'column';
     winnerPTag.innerHTML = strMessage;
-    gameBoard.appendChild(winnerPTag);
+    gameBoardDiv.appendChild(winnerPTag);
 
     let playAgainButton = document.createElement('button');
     playAgainButton.innerHTML = 'Play Again?';
     playAgainButton.addEventListener('click', () => {
-      currentUser.gameBoard = new GameBoard();
-      updateLocalStorage();
-      gameBoard.style.flexDirection = 'row';
-      gameBoard.innerHTML = '';
-      document.querySelector('#guessDiv').innerHTML = '';
-      currentUser.gameBoard.renderBoard();
+      this.startAnotherGame();
     });
-    gameBoard.appendChild(playAgainButton);
+    gameBoardDiv.appendChild(playAgainButton);
   }
 
   // when a game state is rerendered this loops through previous guesses to update the board
@@ -212,6 +207,24 @@ class GameBoard {
       colorBoxes[currentUser.gameBoard.gameCounter - 1].style.background = 'white';
       currentUser.gameBoard.gameCounter--;
     }
+  }
+
+  switchToMediumMode() {
+    if(lightModeColors.length === 8) {
+      lightModeColors.push('rgb(0, 128, 128)');
+      darkModeColors.push('rgb(77, 255, 255)');
+    }
+    currentUser.gameBoard.startAnotherGame();
+  }
+
+  startAnotherGame() {
+    let gameBoardDiv = document.querySelector('#colorBoard');
+    currentUser.gameBoard = new GameBoard();
+    updateLocalStorage();
+    gameBoardDiv.style.flexDirection = 'row';
+    gameBoardDiv.innerHTML = '';
+    document.querySelector('#guessDiv').innerHTML = '';
+    currentUser.gameBoard.renderBoard();
   }
 }
 
@@ -352,6 +365,10 @@ function startGame() {
   });
   let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type');
   colorModeToggle.addEventListener('click', colorModeToggleHandler);
+
+  let mediumSelection = document.querySelector('.dropdown-menu li:nth-child(2) span:nth-child(3)');
+  mediumSelection.addEventListener('click', currentUser.gameBoard.switchToMediumMode);
+  console.log(currentUser.gameBoard.correctColorCombo);
 }
 
 // start with setting the global variable of user array to what's in local storage
@@ -415,7 +432,6 @@ function toggleColorCombo(newColorArr, oldColorArr) {
     for(let colorIndex in oldColorArr) {
       if(currentUser.gameBoard.correctColorCombo[correctColor] === oldColorArr[colorIndex]) {
         currentUser.gameBoard.correctColorCombo[correctColor] = newColorArr[colorIndex];
-        console.log(currentUser.gameBoard.correctColorCombo[correctColor]);
         break;
       }
     }
