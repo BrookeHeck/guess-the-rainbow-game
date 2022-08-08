@@ -178,14 +178,19 @@ class GameBoard {
     gameBoard.innerHTML = '';
     let strMessage = winner ? 'Congrats, You Won!' : 'So Close! Thanks for Playing';
     let winnerPTag = document.createElement('p');
-    winnerPTag.innerHTML = strMessage;
     gameBoard.style.flexDirection = 'column';
+    winnerPTag.innerHTML = strMessage;
     gameBoard.appendChild(winnerPTag);
 
     let playAgainButton = document.createElement('button');
     playAgainButton.innerHTML = 'Play Again?';
     playAgainButton.addEventListener('click', () => {
-      location.reload();
+      currentUser.gameBoard = new GameBoard();
+      updateLocalStorage();
+      gameBoard.style.flexDirection = 'row';
+      gameBoard.innerHTML = '';
+      document.querySelector('#guessDiv').innerHTML = '';
+      currentUser.gameBoard.renderBoard();
     });
     gameBoard.appendChild(playAgainButton);
   }
