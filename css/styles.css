@@ -112,9 +112,9 @@ button:hover {
 }
 
 .oneColor, .colorBox {
-  border: solid black 1px;
+  border: solid black 2px;
   border-radius: 2px;
-  background-color: white;
+  background-color: rgb(230, 230, 230);
   display: inline;
   width: 50px;
   height: 50px;
@@ -127,7 +127,7 @@ button:hover {
   height: 50px;
   margin: 5px 5px;
   background-color: white;
-  border: solid black 1px;
+  border: solid black 2px;
   border-radius: 2px;
 }
 
@@ -176,6 +176,16 @@ button:hover {
 
 #statsDiv>* {
   padding: 3px;
+}
+
+.dropdown-menu span {
+  font-size: 1.1rem;
+  margin: 5px;
+}
+
+.dropdown-menu span:hover {
+  cursor: pointer;
+  border-bottom: solid black 1px;
 }
 
 footer {
