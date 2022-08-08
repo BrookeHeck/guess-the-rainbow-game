@@ -9,7 +9,8 @@ let currentUserIndex = 0;
 const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
   'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(115, 54, 0)'];
 
-const darkModeColors = ['rgb(255, 0, 0)', 'rgb(255, 172, 0)', 'rgb(255, 241, 0)', 'rgb(11, 255, 0)', 'rgb(0, 246, 255)', 'rgb(176, 38, 255)', 'rgb(255, 110, 199)', 'rgb(173, 81, 0)'];
+const darkModeColors = ['rgb(255, 0, 0)', 'rgb(255, 172, 0)', 'rgb(255, 241, 0)', 'rgb(11, 255, 0)',
+  'rgb(0, 246, 255)', 'rgb(176, 38, 255)', 'rgb(255, 110, 199)', 'rgb(173, 81, 0)'];
 
 // gets five random colors with no duplicates from light color mode array
 function getColorComboAnswer() {
@@ -25,7 +26,8 @@ function getColorComboAnswer() {
 
 // class to hold User data to be stored in local storage
 class User {
-  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0, totalGamesPlayed = 0, winAverage = 0, colorMode = 'light') {
+  constructor (username, gameBoard, totalGamesWon = 0, winStreak = 0, highestWinStreak = 0,
+    totalGamesPlayed = 0, winAverage = 0, colorMode = 'light') {
     this.username = username;
     this.totalGamesWon = totalGamesWon;
     this.winStreak = winStreak;
@@ -234,7 +236,8 @@ function handleColorPick(event) {
   }
 }
 
-// this function takes the guess uses functions from the gameboard class to get the guess, add it to an array, check if the guess is right, and update the board accordingly
+// this function takes the guess uses functions from the gameboard class to get the guess,
+// add it to an array, check if the guess is right, and update the board accordingly
 function handleCompleteGuess() {
   let winner = false;
   let guess = currentUser.gameBoard.getGuessArray();
@@ -321,7 +324,8 @@ function createUserObject(existingUser) {
 
 // if the user exists, makes the user object with data from local storage
 function createExistingUserObject(existingUser) {
-  let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo, existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
+  let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo,
+    existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
 
   let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage, existingUser.colorMode);
   currentUser = existingUserNewObject;
@@ -341,13 +345,14 @@ function startGame() {
   statsButton.addEventListener('click', () => {
     currentUser.displayUserStats();
   });
-  let settingsButton =  document.querySelector('ul li:nth-of-type(3) img');
-  settingsButton.addEventListener('click', colorModeToggleHandler);
+  let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type')
+  colorModeToggle.addEventListener('click', colorModeToggleHandler);
 }
 
 // start with setting the global variable of user array to what's in local storage
 getLocalStorage();
-// displays the form to get the user's name, and then the previous functions are used to set up the correct game board and start the game
+// displays the form to get the user's name
+//then the previous functions are used to set up the correct game board and start the game
 getUserName();
 // start the user off with a light background
 toggleHeaderColor(lightModeColors);
@@ -357,6 +362,7 @@ toggleHeaderColor(lightModeColors);
 
 // enable setting to be changed, event listener add to settings button in startGame()
 function colorModeToggleHandler() {
+  document.querySelector('.dropdown-menu li span:first-of-type').innerHTML = `${currentUser.colorMode} mode`;
   currentUser.colorMode = currentUser.colorMode === 'light' ? 'dark' : 'light';
   let newColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
   let oldColorArr = currentUser.colorMode === 'light' ? darkModeColors : lightModeColors;
@@ -382,6 +388,7 @@ function toggleHeaderColor(colorModeArr) {
   }
 }
 
+// change the main, nav, and text to opposite color
 function toggleBackgroundColor() {
   let navClasses = document.querySelector('.navbar').classList;
   let displayName = document.querySelector('#displayName');
@@ -410,9 +417,9 @@ function toggleColorCombo(newColorArr, oldColorArr) {
   }
 }
 
+// changes the boxes already with colors to the opposite color mode
 function toggleBoardColors(newColorArr, oldColorArr) {
   let allBoxes = [document.querySelectorAll('.oneColor'), document.querySelectorAll('.colorBox')];
-
   for(let boxArr of allBoxes) {
     for(let box of boxArr) {
       if(box.style.background !== 'rgb(230, 230, 230)') {

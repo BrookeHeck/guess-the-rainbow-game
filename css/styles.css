@@ -178,6 +178,16 @@ button:hover {
   padding: 3px;
 }
 
+.dropdown-menu span {
+  font-size: 1.1rem;
+  margin: 5px;
+}
+
+.dropdown-menu span:hover {
+  cursor: pointer;
+  border-bottom: solid black 1px;
+}
+
 footer {
   width: 100%;
   margin-bottom: 25px;
