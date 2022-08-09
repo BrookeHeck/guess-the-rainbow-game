@@ -112,6 +112,7 @@ class GameBoard {
       }
     }
 
+    // use this conditional to render the right amount of colors based on difficulty level
     if(lightModeColors.length === 8 &&
       (this.difficultyLevel === 'medium' || this.difficultyLevel === 'hard')) {
       lightModeColors.push('rgb(0, 128, 128)');
@@ -225,6 +226,7 @@ class GameBoard {
     }
   }
 
+  // changes colors and numbers of guesses based on difficulty level chosen by user
   switchDifficulty(event) {
     let chosenDifficulty = event.target.innerHTML;
     if(lightModeColors.length === 8 && (chosenDifficulty === 'medium' || chosenDifficulty === 'hard')) {
@@ -239,16 +241,17 @@ class GameBoard {
     currentUser.gameBoard.startAnotherGame(this.difficultyLevel, this.numGuesses);
   }
 
+  // creates a new game board and rerenders it when a user wants to play again or change difficulty
   startAnotherGame(difficulty, guesses) {
     let gameBoardDiv = document.querySelector('#colorBoard');
-    console.log(new GameBoard(difficulty, guesses));
     currentUser.gameBoard = new GameBoard(difficulty, guesses);
     updateLocalStorage();
     gameBoardDiv.style.flexDirection = 'row';
     gameBoardDiv.innerHTML = '';
     document.querySelector('#guessDiv').innerHTML = '';
-    currentUser.gameBoard.renderBoard();
     document.querySelector('#statsDiv').innerHTML = '';
+
+    currentUser.gameBoard.renderBoard();
   }
 }
 
@@ -379,6 +382,10 @@ function createExistingUserObject(existingUser) {
 function startGame() {
   document.querySelector('.navbar-nav').style.visibility = 'visible';
   currentUser.gameBoard.renderBoard();
+  if(currentUser.colorMode === 'dark') {
+    currentUser.colorMode = 'light';
+    colorModeToggleHandler();
+  }
   currentUser.gameBoard.addPreviousGuesses();
   let startUpdateAt = 0;
   for(let guess of currentUser.gameBoard.previousGuesses) {
