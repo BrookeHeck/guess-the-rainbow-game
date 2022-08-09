@@ -5,7 +5,6 @@ let allUserArray;
 let globalUserName;
 let currentUser;
 let currentUserIndex = 0;
-
 const lightModeColors = ['rgb(204, 0, 0)', 'rgb(204, 102, 0)', 'rgb(204, 204, 0)',
   'rgb(0, 204, 0)', 'rgb(0, 0, 204)', 'rgb(102, 0, 204)', 'rgb(255, 51, 153)', 'rgb(115, 54, 0)'];
 
@@ -15,10 +14,16 @@ const darkModeColors = ['rgb(255, 0, 0)', 'rgb(255, 172, 0)', 'rgb(255, 241, 0)'
 // gets five random colors with no duplicates from light color mode array
 function getColorComboAnswer() {
   let combo = [];
+  let currColorArr;
+  if(currentUser) {
+    currColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
+  } else {
+    currColorArr = lightModeColors;
+  }
   while(combo.length < 5) {
-    let index = Math.floor(Math.random() * lightModeColors.length);
-    if(!combo.includes(lightModeColors[index])) {
-      combo.push(lightModeColors[index]);
+    let index = Math.floor(Math.random() * currColorArr.length);
+    if(!combo.includes(currColorArr[index])) {
+      combo.push(currColorArr[index]);
     }
   }
   return combo;
@@ -85,7 +90,9 @@ class User {
 // class will hold the user's gameboard state so it can be rerendered later
 // also holds all the functions with the game logic
 class GameBoard {
-  constructor (correctColorCombo = getColorComboAnswer(), previousGuesses = [], gameCounter = 0) {
+  constructor (difficultyLevel = 'easy', numGuesses = 6, correctColorCombo = getColorComboAnswer(), previousGuesses = [], gameCounter = 0) {
+    this.difficultyLevel = difficultyLevel;
+    this.numGuesses = numGuesses;
     this.correctColorCombo = correctColorCombo;
     this.previousGuesses = previousGuesses;
     this.gameCounter = gameCounter;
@@ -94,7 +101,7 @@ class GameBoard {
   renderBoard() {
     // guessDiv is the 5 x 6 grid that shows previous guesses/right and wrong answers
     let guessDiv = document.querySelector('#guessDiv');
-    for(let y = 0; y < 6; y++) {
+    for(let y = 0; y < this.numGuesses; y++) {
       let guessRow = document.createElement('div');
       guessRow.setAttribute('class', 'guessRow');
       guessDiv.appendChild(guessRow);
@@ -103,6 +110,16 @@ class GameBoard {
         oneColor.setAttribute('class', 'oneColor');
         guessRow.appendChild(oneColor);
       }
+    }
+
+    // use this conditional to render the right amount of colors based on difficulty level
+    if(lightModeColors.length === 8 &&
+      (this.difficultyLevel === 'medium' || this.difficultyLevel === 'hard')) {
+      lightModeColors.push('rgb(0, 128, 128)');
+      darkModeColors.push('rgb(179,191,255)');
+    } else if (lightModeColors.length === 9 && this.difficultyLevel === 'easy') {
+      lightModeColors.pop();
+      darkModeColors.pop();
     }
 
     // colorBoard is the color choices that users can click on
@@ -174,25 +191,20 @@ class GameBoard {
 
   // clears the color picker board and puts a message and play again button after the game ends
   clear (winner) {
-    let gameBoard = document.querySelector('#colorBoard');
-    gameBoard.innerHTML = '';
+    let gameBoardDiv = document.querySelector('#colorBoard');
+    gameBoardDiv.innerHTML = '';
     let strMessage = winner ? 'Congrats, You Won!' : 'So Close! Thanks for Playing';
     let winnerPTag = document.createElement('p');
-    gameBoard.style.flexDirection = 'column';
+    gameBoardDiv.style.flexDirection = 'column';
     winnerPTag.innerHTML = strMessage;
-    gameBoard.appendChild(winnerPTag);
+    gameBoardDiv.appendChild(winnerPTag);
 
     let playAgainButton = document.createElement('button');
     playAgainButton.innerHTML = 'Play Again?';
     playAgainButton.addEventListener('click', () => {
-      currentUser.gameBoard = new GameBoard();
-      updateLocalStorage();
-      gameBoard.style.flexDirection = 'row';
-      gameBoard.innerHTML = '';
-      document.querySelector('#guessDiv').innerHTML = '';
-      currentUser.gameBoard.renderBoard();
+      this.startAnotherGame(this.difficultyLevel, this.numGuesses);
     });
-    gameBoard.appendChild(playAgainButton);
+    gameBoardDiv.appendChild(playAgainButton);
   }
 
   // when a game state is rerendered this loops through previous guesses to update the board
@@ -213,6 +225,34 @@ class GameBoard {
       currentUser.gameBoard.gameCounter--;
     }
   }
+
+  // changes colors and numbers of guesses based on difficulty level chosen by user
+  switchDifficulty(event) {
+    let chosenDifficulty = event.target.innerHTML;
+    if(lightModeColors.length === 8 && (chosenDifficulty === 'medium' || chosenDifficulty === 'hard')) {
+      lightModeColors.push('rgb(0, 128, 128)');
+      darkModeColors.push('rgb(179,191,255)');
+    } else if (lightModeColors.length === 9 && chosenDifficulty === 'easy') {
+      lightModeColors.pop();
+      darkModeColors.pop();
+    }
+    this.numGuesses = chosenDifficulty === 'hard' ? 5 : 6;
+    this.difficultyLevel = chosenDifficulty;
+    currentUser.gameBoard.startAnotherGame(this.difficultyLevel, this.numGuesses);
+  }
+
+  // creates a new game board and rerenders it when a user wants to play again or change difficulty
+  startAnotherGame(difficulty, guesses) {
+    let gameBoardDiv = document.querySelector('#colorBoard');
+    currentUser.gameBoard = new GameBoard(difficulty, guesses);
+    updateLocalStorage();
+    gameBoardDiv.style.flexDirection = 'row';
+    gameBoardDiv.innerHTML = '';
+    document.querySelector('#guessDiv').innerHTML = '';
+    document.querySelector('#statsDiv').innerHTML = '';
+
+    currentUser.gameBoard.renderBoard();
+  }
 }
 
 // this is the event listener for the color choices that users can click
@@ -230,11 +270,11 @@ function handleColorPick(event) {
       // handle complete guess will add borders to the guess board and save the previous guess
       let winner = handleCompleteGuess();
       // if they win or run out of guesses, update stats and create a new board for user
-      if(currentUser.gameBoard.gameCounter === 30 || winner) {
+      if(currentUser.gameBoard.gameCounter === (currentUser.gameBoard.numGuesses * 5) || winner) {
         currentUser.updateStats(winner);
         currentUser.displayUserStats();
         currentUser.gameBoard.clear(winner);
-        currentUser.gameBoard = new GameBoard();
+        // currentUser.gameBoard = new GameBoard();
         updateLocalStorage();
       }
     }
@@ -329,7 +369,8 @@ function createUserObject(existingUser) {
 
 // if the user exists, makes the user object with data from local storage
 function createExistingUserObject(existingUser) {
-  let existingGame = new GameBoard(existingUser.gameBoard.correctColorCombo,
+  let existingGame = new GameBoard( existingUser.gameBoard.difficultyLevel,
+    existingUser.gameBoard.numGuesses, existingUser.gameBoard.correctColorCombo,
     existingUser.gameBoard.previousGuesses, existingUser.gameBoard.gameCounter);
 
   let existingUserNewObject = new User(globalUserName, existingGame, existingUser.totalGamesWon, existingUser.winStreak, existingUser.highestWinStreak, existingUser.totalGamesPlayed, existingUser.winAverage, existingUser.colorMode);
@@ -339,7 +380,12 @@ function createExistingUserObject(existingUser) {
 // renders the board and if the user had a previous game it will render previous guesses and update the game counter
 // also adds event listeners so that user can see their game stats and settings
 function startGame() {
+  document.querySelector('.navbar-nav').style.visibility = 'visible';
   currentUser.gameBoard.renderBoard();
+  if(currentUser.colorMode === 'dark') {
+    currentUser.colorMode = 'light';
+    colorModeToggleHandler();
+  }
   currentUser.gameBoard.addPreviousGuesses();
   let startUpdateAt = 0;
   for(let guess of currentUser.gameBoard.previousGuesses) {
@@ -350,8 +396,13 @@ function startGame() {
   statsButton.addEventListener('click', () => {
     currentUser.displayUserStats();
   });
-  let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type')
+  let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type');
   colorModeToggle.addEventListener('click', colorModeToggleHandler);
+
+  for(let i = 1; i < 6; i+=2) {
+    let selectionElement = document.querySelector(`.dropdown-menu li:nth-child(2) span:nth-child(${i})`);
+    selectionElement.addEventListener('click', currentUser.gameBoard.switchDifficulty);
+  }
 }
 
 // start with setting the global variable of user array to what's in local storage
@@ -415,7 +466,6 @@ function toggleColorCombo(newColorArr, oldColorArr) {
     for(let colorIndex in oldColorArr) {
       if(currentUser.gameBoard.correctColorCombo[correctColor] === oldColorArr[colorIndex]) {
         currentUser.gameBoard.correctColorCombo[correctColor] = newColorArr[colorIndex];
-        console.log(currentUser.gameBoard.correctColorCombo[correctColor]);
         break;
       }
     }
@@ -439,6 +489,7 @@ function toggleBoardColors(newColorArr, oldColorArr) {
   }
 }
 
+// loops through the previous guess array and changes them all to dark mode colors
 function togglePreviousGuesses(newColorArr, oldColorArr) {
   for(let guessIndex in currentUser.gameBoard.previousGuesses) {
     for(let colorSelected in currentUser.gameBoard.previousGuesses[guessIndex]) {
