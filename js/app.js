@@ -122,12 +122,20 @@ class GameBoard {
       darkModeColors.pop();
     }
 
+    // figure out which color mode colors to use
+    let currColorArr;
+    if(currentUser) {
+      currColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
+    } else {
+      currColorArr = lightModeColors;
+    }
+
     // colorBoard is the color choices that users can click on
     let colorBoard = document.querySelector('#colorBoard');
     for(let i = 0; i < lightModeColors.length; i++) {
       let colorBox = document.createElement('div');
       colorBox.setAttribute('class', 'colorBox');
-      colorBox.style.background =`${lightModeColors[i]}`;
+      colorBox.style.background =`${currColorArr[i]}`;
       colorBoard.appendChild(colorBox);
       colorBoard.addEventListener('click', handleColorPick);
     }
@@ -231,7 +239,7 @@ class GameBoard {
     let chosenDifficulty = event.target.innerHTML;
     if(lightModeColors.length === 8 && (chosenDifficulty === 'medium' || chosenDifficulty === 'hard')) {
       lightModeColors.push('rgb(0, 128, 128)');
-      darkModeColors.push('rgb(179,191,255)');
+      darkModeColors.push('rgb(179, 191, 255)');
     } else if (lightModeColors.length === 9 && chosenDifficulty === 'easy') {
       lightModeColors.pop();
       darkModeColors.pop();
@@ -250,7 +258,10 @@ class GameBoard {
     gameBoardDiv.innerHTML = '';
     document.querySelector('#guessDiv').innerHTML = '';
     document.querySelector('#statsDiv').innerHTML = '';
-
+    if(currentUser.colorMode === 'dark') {
+      currentUser.colorMode = 'light';
+      colorModeToggleHandler();
+    }
     currentUser.gameBoard.renderBoard();
   }
 }
