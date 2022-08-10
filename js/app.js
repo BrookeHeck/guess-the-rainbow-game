@@ -73,10 +73,17 @@ class User {
   displayUserStats() {
     let winStatsArr = this.createStatsArr();
     let statsDiv = document.querySelector('#statsDiv');
+    statsDiv.style.visibility = 'visible';
     let closeButton = document.createElement('button');
     closeButton.innerHTML = 'X';
     closeButton.addEventListener('click', () => {
       statsDiv.innerHTML = '';
+      statsDiv.style.visibility = 'hidden';
+      let statsButton = document.querySelector('nav img:first-of-type');
+      statsButton.addEventListener('click', function handle(event) {
+        event.target.removeEventListener('click', handle);
+        currentUser.displayUserStats();
+      });
     });
     statsDiv.appendChild(closeButton);
     for(let stat of winStatsArr) {
@@ -404,7 +411,8 @@ function startGame() {
     startUpdateAt += 5;
   }
   let statsButton = document.querySelector('nav img:first-of-type');
-  statsButton.addEventListener('click', () => {
+  statsButton.addEventListener('click', function handle(event) {
+    event.target.removeEventListener('click', handle);
     currentUser.displayUserStats();
   });
   let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type');
