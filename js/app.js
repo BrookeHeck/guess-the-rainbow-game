@@ -188,11 +188,11 @@ class GameBoard {
     for(let i = 0; i < compareArr.length; i++) {
       let key = document.querySelectorAll('.guessRow>*')[i + counterStart];
       if(compareArr[i] === 1) {
-        key.style.border = 'solid green 5px';
+        key.style.outline = 'solid green 4px';
       } else if (compareArr[i] === 2) {
-        key.style.border = 'solid rgb(170,181,167) 5px';
+        key.style.outline = 'solid rgb(170,181,167) 4px';
       } else {
-        key.style.border = 'solid red 5px';
+        key.style.outline = 'solid red 4px';
       }
     }
   }
