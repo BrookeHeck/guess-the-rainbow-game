@@ -73,10 +73,17 @@ class User {
   displayUserStats() {
     let winStatsArr = this.createStatsArr();
     let statsDiv = document.querySelector('#statsDiv');
+    statsDiv.style.visibility = 'visible';
     let closeButton = document.createElement('button');
     closeButton.innerHTML = 'X';
     closeButton.addEventListener('click', () => {
       statsDiv.innerHTML = '';
+      statsDiv.style.visibility = 'hidden';
+      let statsButton = document.querySelector('nav img:first-of-type');
+      statsButton.addEventListener('click', function handle(event) {
+        event.target.removeEventListener('click', handle);
+        currentUser.displayUserStats();
+      });
     });
     statsDiv.appendChild(closeButton);
     for(let stat of winStatsArr) {
@@ -122,12 +129,20 @@ class GameBoard {
       darkModeColors.pop();
     }
 
+    // figure out which color mode colors to use
+    let currColorArr;
+    if(currentUser) {
+      currColorArr = currentUser.colorMode === 'light' ? lightModeColors : darkModeColors;
+    } else {
+      currColorArr = lightModeColors;
+    }
+
     // colorBoard is the color choices that users can click on
     let colorBoard = document.querySelector('#colorBoard');
     for(let i = 0; i < lightModeColors.length; i++) {
       let colorBox = document.createElement('div');
       colorBox.setAttribute('class', 'colorBox');
-      colorBox.style.background =`${lightModeColors[i]}`;
+      colorBox.style.background =`${currColorArr[i]}`;
       colorBoard.appendChild(colorBox);
       colorBoard.addEventListener('click', handleColorPick);
     }
@@ -180,11 +195,11 @@ class GameBoard {
     for(let i = 0; i < compareArr.length; i++) {
       let key = document.querySelectorAll('.guessRow>*')[i + counterStart];
       if(compareArr[i] === 1) {
-        key.style.border = 'solid green 5px';
+        key.style.outline = 'solid green 4px';
       } else if (compareArr[i] === 2) {
-        key.style.border = 'solid rgb(170,181,167) 5px';
+        key.style.outline = 'solid rgb(170,181,167) 4px';
       } else {
-        key.style.border = 'solid red 5px';
+        key.style.outline = 'solid red 4px';
       }
     }
   }
@@ -231,7 +246,7 @@ class GameBoard {
     let chosenDifficulty = event.target.innerHTML;
     if(lightModeColors.length === 8 && (chosenDifficulty === 'medium' || chosenDifficulty === 'hard')) {
       lightModeColors.push('rgb(0, 128, 128)');
-      darkModeColors.push('rgb(179,191,255)');
+      darkModeColors.push('rgb(179, 191, 255)');
     } else if (lightModeColors.length === 9 && chosenDifficulty === 'easy') {
       lightModeColors.pop();
       darkModeColors.pop();
@@ -250,7 +265,10 @@ class GameBoard {
     gameBoardDiv.innerHTML = '';
     document.querySelector('#guessDiv').innerHTML = '';
     document.querySelector('#statsDiv').innerHTML = '';
-
+    if(currentUser.colorMode === 'dark') {
+      currentUser.colorMode = 'light';
+      colorModeToggleHandler();
+    }
     currentUser.gameBoard.renderBoard();
   }
 }
@@ -393,7 +411,8 @@ function startGame() {
     startUpdateAt += 5;
   }
   let statsButton = document.querySelector('nav img:first-of-type');
-  statsButton.addEventListener('click', () => {
+  statsButton.addEventListener('click', function handle(event) {
+    event.target.removeEventListener('click', handle);
     currentUser.displayUserStats();
   });
   let colorModeToggle = document.querySelector('.dropdown-menu li span:first-of-type');
